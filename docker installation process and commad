@@ -1,0 +1,215 @@
+yum docker install -y 
+
+cd /bin/
+systemctl status docker
+systemctl enable docker
+systemctl disable docker
+
+service enabled in location :
+
+/usr/lib/systemd/system/docker.service
+
+
+================
+
+
+[root@ip-10-200-82-166 system]# systemctl status docker
+? docker.service - Docker Application Container Engine
+   Loaded: loaded (/usr/lib/systemd/system/docker.service; enabled; vendor preset: disabled)
+   Active: active (running) since Sun 2019-05-12 04:00:33 UTC; 11min ago
+     Docs: https://docs.docker.com
+ Main PID: 3391 (dockerd)
+   CGroup: /system.slice/docker.service
+           +-3391 /usr/bin/dockerd --default-ulimit nofile=1024:4096
+           +-3405 docker-containerd --config /var/run/docker/containerd/containerd.toml
+
+May 12 04:00:33 ip-10-200-82-166.ec2.internal dockerd[3391]: time="2019-05-12T04:00:33.215344614Z" level=info msg="pickfirstBalancer: HandleSubConnStateChange: 0xc420187950, CONN...module=grpc
+May 12 04:00:33 ip-10-200-82-166.ec2.internal dockerd[3391]: time="2019-05-12T04:00:33.216006160Z" level=info msg="pickfirstBalancer: HandleSubConnStateChange: 0xc420187950, READY" module=grpc
+May 12 04:00:33 ip-10-200-82-166.ec2.internal dockerd[3391]: time="2019-05-12T04:00:33.216361473Z" level=info msg="Loading containers: start."
+May 12 04:00:33 ip-10-200-82-166.ec2.internal dockerd[3391]: time="2019-05-12T04:00:33.476821875Z" level=info msg="Default bridge (docker0) is assigned with an IP address 172.17....IP address"
+May 12 04:00:33 ip-10-200-82-166.ec2.internal dockerd[3391]: time="2019-05-12T04:00:33.509417895Z" level=info msg="Loading containers: done."
+May 12 04:00:33 ip-10-200-82-166.ec2.internal dockerd[3391]: time="2019-05-12T04:00:33.647414004Z" level=info msg="Docker daemon" commit=e68fc7a/18.06.1-ce graphdriver(s)=overlay...=18.06.1-ce
+May 12 04:00:33 ip-10-200-82-166.ec2.internal dockerd[3391]: time="2019-05-12T04:00:33.647963783Z" level=info msg="Daemon has completed initialization"
+May 12 04:00:33 ip-10-200-82-166.ec2.internal dockerd[3391]: time="2019-05-12T04:00:33.654425148Z" level=warning msg="Could not register builder git source: failed to find git bi...d in $PATH"
+May 12 04:00:33 ip-10-200-82-166.ec2.internal systemd[1]: Started Docker Application Container Engine.
+May 12 04:00:33 ip-10-200-82-166.ec2.internal dockerd[3391]: time="2019-05-12T04:00:33.672885066Z" level=info msg="API listen on /var/run/docker.sock"
+Hint: Some lines were ellipsized, use -l to show in full.
+
+
+[root@ip-10-200-82-166 docker]# systemctl status docker.service | grep Loaded
+   Loaded: loaded (/usr/lib/systemd/system/docker.service; enabled; vendor preset: disabled)
+[root@ip-10-200-82-166 docker]#
+
+
+[root@ip-10-200-82-166 docker]# cat /usr/lib/systemd/system/docker.service
+[Unit]
+Description=Docker Application Container Engine
+Documentation=https://docs.docker.com
+After=network-online.target firewalld.service
+Wants=network-online.target
+
+[Service]
+Type=notify
+EnvironmentFile=-/etc/sysconfig/docker
+EnvironmentFile=-/etc/sysconfig/docker-storage
+EnvironmentFile=-/run/docker/runtimes.env
+ExecStartPre=/bin/mkdir -p /run/docker
+ExecStartPre=/usr/libexec/docker/docker-setup-runtimes.sh
+# the default is not to use systemd for cgroups because the delegate issues still
+# exists and systemd currently does not support the cgroup feature set required
+# for containers run by docker
+ExecStart=/usr/bin/dockerd $OPTIONS $DOCKER_STORAGE_OPTIONS $DOCKER_ADD_RUNTIMES
+ExecReload=/bin/kill -s HUP $MAINPID
+# Having non-zero Limit*s causes performance problems due to accounting overhead
+# in the kernel. We recommend using cgroups to do container-local accounting.
+LimitNOFILE=infinity
+LimitNPROC=infinity
+LimitCORE=infinity
+# Uncomment TasksMax if your systemd version supports it.
+# Only systemd 226 and above support this version.
+#TasksMax=infinity
+TimeoutStartSec=0
+# set delegate yes so that systemd does not reset the cgroups of docker containers
+Delegate=yes
+# kill only the docker process, not all processes in the cgroup
+KillMode=process
+# restart the docker process if it exits prematurely
+Restart=on-failure
+StartLimitBurst=3
+StartLimitInterval=60s
+
+[Install]
+WantedBy=multi-user.target
+[root@ip-10-200-82-166 docker]#
+
+
+=============================
+
+
+[root@ip-10-200-82-166 system]# docker version
+Client:
+ Version:           18.06.1-ce
+ API version:       1.38
+ Go version:        go1.10.3
+ Git commit:        e68fc7a215d7133c34aa18e3b72b4a21fd0c6136
+ Built:             Mon Mar  4 21:25:41 2019
+ OS/Arch:           linux/amd64
+ Experimental:      false
+
+Server:
+ Engine:
+  Version:          18.06.1-ce
+  API version:      1.38 (minimum version 1.12)
+  Go version:       go1.10.3
+  Git commit:       e68fc7a/18.06.1-ce
+  Built:            Mon Mar  4 21:27:07 2019
+  OS/Arch:          linux/amd64
+  Experimental:     false
+[root@ip-10-200-82-166 system]#
+
+
+===========
+
+
+[root@ip-10-200-82-166 system]# docker info
+Containers: 1
+ Running: 0
+ Paused: 0
+ Stopped: 1
+Images: 1
+Server Version: 18.06.1-ce
+Storage Driver: overlay2
+ Backing Filesystem: xfs
+ Supports d_type: true
+ Native Overlay Diff: true
+Logging Driver: json-file
+Cgroup Driver: cgroupfs
+Plugins:
+ Volume: local
+ Network: bridge host macvlan null overlay
+ Log: awslogs fluentd gcplogs gelf journald json-file logentries splunk syslog
+Swarm: inactive
+Runtimes: runc
+Default Runtime: runc
+Init Binary: docker-init
+containerd version: 468a545b9edcd5932818eb9de8e72413e616e86e
+runc version: 69663f0bd4b60df09991c08812a60108003fa340
+init version: fec3683
+Security Options:
+ seccomp
+  Profile: default
+Kernel Version: 4.14.114-103.97.amzn2.x86_64
+Operating System: Amazon Linux 2
+OSType: linux
+Architecture: x86_64
+CPUs: 1
+Total Memory: 983.6MiB
+Name: ip-10-200-82-166.ec2.internal
+ID: G6LY:IXB4:LPIP:M5YH:6R3N:XR2Y:CSLR:SD4N:HUMT:VGB7:RYBD:OFZO
+Docker Root Dir: /var/lib/docker
+Debug Mode (client): false
+Debug Mode (server): false
+Registry: https://index.docker.io/v1/
+Labels:
+Experimental: false
+Insecure Registries:
+ 127.0.0.0/8
+Live Restore Enabled: false
+
+[root@ip-10-200-82-166 system]#
+
+
+
+===================================
+
+docker root directory
+
+/var/lib/docker
+
+[root@ip-10-200-82-166 system]# cd /var/lib/docker/
+[root@ip-10-200-82-166 docker]# ls
+builder  buildkit  containerd  containers  image  network  overlay2  plugins  runtimes  swarm  tmp  trust  volumes
+[root@ip-10-200-82-166 docker]# ls -lrt
+total 4
+drwx------  3 root root   20 May 11 14:55 containerd
+drwx------  4 root root   32 May 11 14:55 plugins
+drwx------  2 root root   25 May 11 14:55 volumes
+drwx------  3 root root   22 May 11 14:55 image
+drwx------  2 root root    6 May 11 14:55 trust
+drwxr-x---  3 root root   19 May 11 14:55 network
+drwx------  2 root root    6 May 11 14:55 swarm
+drwx------  2 root root   24 May 11 14:55 builder
+drwx------  4 root root   92 May 11 14:55 buildkit
+drwx------  3 root root   78 May 11 15:40 containers
+drwx------  2 root root    6 May 12 04:00 tmp
+drwx------  2 root root    6 May 12 04:00 runtimes
+drwx------ 17 root root 4096 May 12 04:00 overlay2
+
+
+
+[root@ip-10-200-82-166 docker]# ls -lrt
+total 4
+drwx------  3 root root   20 May 11 14:55 containerd
+drwx------  4 root root   32 May 11 14:55 plugins
+drwx------  2 root root   25 May 11 14:55 volumes
+drwx------  3 root root   22 May 11 14:55 image
+drwx------  2 root root    6 May 11 14:55 trust
+drwxr-x---  3 root root   19 May 11 14:55 network
+drwx------  2 root root    6 May 11 14:55 swarm
+drwx------  2 root root   24 May 11 14:55 builder
+drwx------  4 root root   92 May 11 14:55 buildkit
+drwx------  3 root root   78 May 11 15:40 containers
+drwx------  2 root root    6 May 12 04:00 tmp
+drwx------  2 root root    6 May 12 04:00 runtimes
+drwx------ 17 root root 4096 May 12 04:00 overlay2
+[root@ip-10-200-82-166 docker]# cd containers/
+[root@ip-10-200-82-166 containers]# ls
+e0990f23b77d248bc1d893b0e470fcc4b80a147185d207610c0f98ecf2558538
+
+
+
+
+
+
+
+
