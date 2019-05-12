@@ -1,0 +1,119 @@
+When you run any docker command on Linux, the docker binary will try to connect to /var/run/docker.sock. This allows you to run docker commands as non-root-user without using sudo all the time.
+
+docker version
+docker info
+systemctl enable docker
+systemctl disable docker
+docker ps
+docker ps -a
+docker iamges
+docker start
+docker stop
+docker build -t harikrishna1233/paymentgatewayapp:1.0.0
+docker login -u dockerhub -p ***
+docker push harikrishna1233/paymentgateway:1.0.0
+
+/var/run/docker.sock
+
+sudo usermod -aG jenkins docker
+sudo usermod -aG docker jenkins
+
+
+===========================================
+
+
+docker-containerd --config /var/run/docker/containerd/containerd.toml
+/usr/bin/dockerd --default-ulimit nofile=1024:4096
+
+cat /var/run/docker/containerd/containerd.toml
+
+
+[root@ip-10-200-82-166 run]# cat /var/run/docker/containerd/containerd.toml
+root = "/var/lib/docker/containerd/daemon"
+state = "/var/run/docker/containerd/daemon"
+disabled_plugins = ["cri"]
+oom_score = -500
+
+[grpc]
+  address = "/var/run/docker/containerd/docker-containerd.sock"
+  uid = 0
+  gid = 0
+  max_recv_message_size = 16777216
+  max_send_message_size = 16777216
+
+[debug]
+  address = "/var/run/docker/containerd/docker-containerd-debug.sock"
+  uid = 0
+  gid = 0
+  level = "info"
+
+[metrics]
+  address = ""
+  grpc_histogram = false
+
+[cgroup]
+  path = ""
+
+[plugins]
+  [plugins.linux]
+    shim = "docker-containerd-shim"
+    runtime = "docker-runc"
+    runtime_root = "/var/lib/docker/runc"
+    no_shim = false
+    shim_debug = false
+[root@ip-10-200-82-166 run]#
+
+
+
+docker deamon will be create from below location
+
+/var/run/docker/containerd/daemon/io.containerd.runtime.v1.linux
+
+
+
+
+check the staticstics for docker
+
+[root@ip-10-200-82-166 ~]# stat /var/run/docker.sock
+  File: ‘/var/run/docker.sock’
+  Size: 0               Blocks: 0          IO Block: 4096   socket
+Device: 14h/20d Inode: 19977       Links: 1
+Access: (0660/srw-rw----)  Uid: (    0/    root)   Gid: (  993/  docker)
+Access: 2019-05-12 06:30:47.125894172 +0000
+Modify: 2019-05-12 05:45:58.843837499 +0000
+Change: 2019-05-12 05:45:58.843837499 +0000
+ Birth: -
+[root@ip-10-200-82-166 ~]#
+
+
+
+
+give the acces to user & group  for Access socket   ---life  srw-rw----
+
+Access: (0660/srw-rw----)  Uid: (    0/    root)   Gid: (  993/  docker)
+
+
+Given the permissions Access: (0660/srw-rw----), both the owner (root) and the group (docker) can read & write (rw) to the docker socket. This means that if you are either the user root (which you can become temporarily using sudo) or you are a member of the docker group, you will be able to connect to that socket and communicate with the docker daemon.
+
+
+===========================================================================
+Note that the docker daemon itself (dockerd) is running as root, which you can check using
+
+[root@ip-10-200-82-166 ~]# ps aux |grep dockerd
+root      4260  0.0  6.7 735728 68488 ?        Ssl  05:45   0:04 /usr/bin/dockerd --default-ulimit nofile=1024:4096
+root      5592  0.0  0.0 119468   928 pts/2    S+   07:09   0:00 grep --color=auto dockerd
+===========================================================================
+
+
+docker deamon run as with root user in /usr/bin/dockerd location
+
+
+
+
+
+
+
+
+
+
+
