@@ -1,0 +1,78 @@
+sudo apt-get update -y
+sudo apt-get upgrade -y
+sudo apt-get install nginx 
+sudo service nginx start
+sudo systemctl start nginx
+
+
+===========
+
+[root@ip-10-200-82-166 ~]# service nginx status
+Redirecting to /bin/systemctl status nginx.service
+● nginx.service - The nginx HTTP and reverse proxy server
+   Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; vendor preset: disabled)
+   Active: active (running) since Sun 2019-05-12 07:50:59 UTC; 3min 35s ago
+  Process: 6225 ExecStart=/usr/sbin/nginx (code=exited, status=0/SUCCESS)
+  Process: 6218 ExecStartPre=/usr/sbin/nginx -t (code=exited, status=0/SUCCESS)
+  Process: 6200 ExecStartPre=/usr/bin/rm -f /run/nginx.pid (code=exited, status=0/SUCCESS)
+ Main PID: 6232 (nginx)
+    Tasks: 2
+   Memory: 5.8M
+   CGroup: /system.slice/nginx.service
+           ├─6232 nginx: master process /usr/sbin/nginx
+           └─6235 nginx: worker process
+
+May 12 07:50:58 ip-10-200-82-166.ec2.internal systemd[1]: Starting The nginx HTTP and reverse proxy server...
+May 12 07:50:59 ip-10-200-82-166.ec2.internal nginx[6218]: nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+May 12 07:50:59 ip-10-200-82-166.ec2.internal nginx[6218]: nginx: configuration file /etc/nginx/nginx.conf test is successful
+May 12 07:50:59 ip-10-200-82-166.ec2.internal systemd[1]: Failed to read PID from file /run/nginx.pid: Invalid argument
+May 12 07:50:59 ip-10-200-82-166.ec2.internal systemd[1]: Started The nginx HTTP and reverse proxy server.
+[root@ip-10-200-82-166 ~]#
+[root@ip-10-200-82-166 ~]# systemctl status nginx
+● nginx.service - The nginx HTTP and reverse proxy server
+   Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; vendor preset: disabled)
+   Active: active (running) since Sun 2019-05-12 07:50:59 UTC; 3min 49s ago
+  Process: 6225 ExecStart=/usr/sbin/nginx (code=exited, status=0/SUCCESS)
+  Process: 6218 ExecStartPre=/usr/sbin/nginx -t (code=exited, status=0/SUCCESS)
+  Process: 6200 ExecStartPre=/usr/bin/rm -f /run/nginx.pid (code=exited, status=0/SUCCESS)
+ Main PID: 6232 (nginx)
+    Tasks: 2
+   Memory: 5.8M
+   CGroup: /system.slice/nginx.service
+           ├─6232 nginx: master process /usr/sbin/nginx
+           └─6235 nginx: worker process
+
+May 12 07:50:58 ip-10-200-82-166.ec2.internal systemd[1]: Starting The nginx HTTP and reverse proxy server...
+May 12 07:50:59 ip-10-200-82-166.ec2.internal nginx[6218]: nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+May 12 07:50:59 ip-10-200-82-166.ec2.internal nginx[6218]: nginx: configuration file /etc/nginx/nginx.conf test is successful
+May 12 07:50:59 ip-10-200-82-166.ec2.internal systemd[1]: Failed to read PID from file /run/nginx.pid: Invalid argument
+May 12 07:50:59 ip-10-200-82-166.ec2.internal systemd[1]: Started The nginx HTTP and reverse proxy server.
+
+
+
+
+
+[root@ip-10-200-82-166 ~]# /usr/sbin/nginx -v
+nginx version: nginx/1.12.2
+
+
+=================
+
+webserver : nginx
+
+yum install nginx -y
+
+============================================================================================================
+
+
+
+cd /etc/nginx
+
+
+ document root : 
+ 
+ /usr/share/nginx/html.
+ 
+ http conf file location
+
+/etc/nginx/nginx.conf
