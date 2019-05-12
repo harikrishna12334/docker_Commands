@@ -108,7 +108,22 @@ root      5592  0.0  0.0 119468   928 pts/2    S+   07:09   0:00 grep --color=au
 docker deamon run as with root user in /usr/bin/dockerd location
 
 
+systemctl status console-shell.service
+systemctl enable console-shell.service
+systemctl disable console-shell.service
 
+systemctl status docker.service
+systemctl enable docker.service
+systemctl disable docker.service
+
+
+[root@ip-10-200-82-166 /]# systemctl status nginx.service
+? nginx.service - The nginx HTTP and reverse proxy server
+   Loaded: loaded (/usr/lib/systemd/system/nginx.service; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+
+May 12 07:23:42 ip-10-200-82-166.ec2.internal systemd[1]: Unit nginx.service cannot be reloaded because it is inactive.
+[root@ip-10-200-82-166 /]#
 
 
 
